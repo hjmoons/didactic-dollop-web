@@ -29,11 +29,21 @@ function App() {
     );
   };
 
+  const handleDelete = (id) => {
+    setTodos((prev) => prev.filter((todo) => todo.id !== id));
+  };
+
+  const handleUpdate = (updatedTodo) => {
+    setTodos((prev) =>
+      prev.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
+    );
+  }
+
   return (
     <div style={{ padding: '20px' }}>
-      <h1>📝 나의 Todo 리스트</h1>
+      <h2>📝DEMO </h2>
       <AddTodo onAdd={handleAdd} />
-      <TodoList todos={todos} onToggle={handleToggle} />
+      <TodoList todos={todos} onToggle={handleToggle} onDelete={handleDelete} onUpdate={handleUpdate}/>
     </div>
   );
 }
