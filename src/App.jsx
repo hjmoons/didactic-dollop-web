@@ -36,6 +36,12 @@ function App() {
     fetchTodos();
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('jwt');
+    setIsLoggedIn(false);
+    setTodos([]); // 데이터 초기화
+  };
+
   const handleAdd = (newTodo) => {
     setTodos((prev) => [...prev, newTodo]);
   };
@@ -60,7 +66,10 @@ function App() {
     <div>
       {isLoggedIn ? (
         <div style={{ padding: '20px' }}>
-          <h2>📝DEMO </h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <h2>📝 DEMO</h2>
+            <button onClick={handleLogout}>🚪 로그아웃</button>
+          </div>
           <AddTodo onAdd={handleAdd} />
           <TodoList todos={todos} onToggle={handleToggle} onDelete={handleDelete} onUpdate={handleUpdate}/>
         </div>
