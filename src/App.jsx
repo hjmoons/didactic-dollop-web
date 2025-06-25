@@ -2,22 +2,39 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import TodoList from './components/TodoList';
 import AddTodo from './components/AddTodo';
+import LoginForm from './components/LoginForm';
+import RegisterForm from './components/RegisterForm';
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
   const [todos, setTodos] = useState([]);
 
-  const fetchTodos = async () => {
+  useEffect(() => {
+    const token = localStorage.getItem('jwt');
+    if(token){
+      setIsLoggedIn(true);
+      fetchTodos();
+    }
+  }, []);
+
+    const fetchTodos = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/todos');
+      const response = await axios.get('http://localhost:8080/todos', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+        },
+      });
       setTodos(response.data);
     } catch (error) {
       console.error('할 일 가져오기 실패:', error);
     }
   };
 
-  useEffect(() => {
+  const handleLoginSuccess = () => {
+    setIsLoggedIn(true);
     fetchTodos();
-  }, []);
+  };
 
   const handleAdd = (newTodo) => {
     setTodos((prev) => [...prev, newTodo]);
@@ -40,10 +57,18 @@ function App() {
   }
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h2>📝DEMO </h2>
-      <AddTodo onAdd={handleAdd} />
-      <TodoList todos={todos} onToggle={handleToggle} onDelete={handleDelete} onUpdate={handleUpdate}/>
+    <div>
+      {isLoggedIn ? (
+        <div style={{ padding: '20px' }}>
+          <h2>📝DEMO </h2>
+          <AddTodo onAdd={handleAdd} />
+          <TodoList todos={todos} onToggle={handleToggle} onDelete={handleDelete} onUpdate={handleUpdate}/>
+        </div>
+      ) : isRegistering ? (
+        <RegisterForm onGoToLogin={() => setIsRegistering(false)} />
+      ) : (
+        <LoginForm onLoginSuccess={handleLoginSuccess} onGoToRegister={() => setIsRegistering(true)} />
+      )}
     </div>
   );
 }
