@@ -15,7 +15,7 @@ function RegisterForm({ onGoToLogin }) {
       alert('회원가입 성공!');
       onGoToLogin(); // 로그인 화면으로 이동
     } catch (err) {
-      alert('회원가입 실패: ' + (err.response?.data?.message || '서버 오류'));
+      alert('회원가입 실패: ' + (err.response?.data || '서버 오류'));
     }
   };
 
