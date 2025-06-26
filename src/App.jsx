@@ -18,7 +18,7 @@ function App() {
     }
   }, []);
 
-    const fetchTodos = async () => {
+  const fetchTodos = async () => {
     try {
       const response = await axios.get('http://localhost:8080/todos', {
         headers: {
@@ -27,7 +27,13 @@ function App() {
       });
       setTodos(response.data);
     } catch (error) {
-      console.error('할 일 가져오기 실패:', error);
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+        localStorage.removeItem('jwt');  // 토큰 제거
+        setIsLoggedIn(false);           // 로그인 상태 해제 → 로그인 화면으로 리디렉션됨
+      } else {
+        console.error('할 일 가져오기 실패:', error);
+      }
     }
   };
 
