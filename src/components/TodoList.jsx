@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import axios from '../axios';
 
 function TodoList({ todos, onToggle, onDelete, onUpdate }) {
   
@@ -9,7 +9,7 @@ function TodoList({ todos, onToggle, onDelete, onUpdate }) {
    */
   const handleToggle = async (id) => {
     try {
-      const response = await axios.patch(`http://localhost:8080/todos/${id}/toggle`);
+      const response = await axios.patch(`/todos/${id}/toggle`);
       onToggle(response.data); // 업데이트된 todo 전달
     } catch (error) {
       console.error('상태 변경 실패:', error);
@@ -22,7 +22,7 @@ function TodoList({ todos, onToggle, onDelete, onUpdate }) {
    */
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:8080/todos/${id}`);
+      await axios.delete(`/todos/${id}`);
       onDelete(id); // id만 넘겨서 상태 업데이트
     } catch (error) {
       console.error('삭제 실패:', error);
@@ -39,7 +39,7 @@ function TodoList({ todos, onToggle, onDelete, onUpdate }) {
 
   const handleUpdate = async (id) => {
     try {
-      const response = await axios.patch(`http://localhost:8080/todos/${id}`, {
+      const response = await axios.patch(`/todos/${id}`, {
         title: editText,
       });
       onUpdate(response.data); // 업데이트된 todo 전달
@@ -55,52 +55,78 @@ function TodoList({ todos, onToggle, onDelete, onUpdate }) {
   };
 
   return (
-    <div>
-      <h3>📋 Todo List</h3>
-      <ul>
-        {todos.length === 0 ? (
-          <li>할 일이 없습니다.</li>
-        ) : (
-          todos.map((todo) => (
-            <li key={todo.id}>
+    <div className="mt-6">
+      <h3 className="text-lg font-bold mb-4">📋 Todo List</h3>
+      {todos.length === 0 ? (
+        <p className="text-gray-500">할 일이 없습니다.</p>
+      ) : (
+        <ul className="space-y-2">
+          {todos.map((todo) => (
+            <li
+              key={todo.id}
+              className="flex items-center justify-between bg-white p-4 rounded shadow"
+            >
               {editingId === todo.id ? (
-                <>
+                <div className="flex w-full gap-2 items-center">
                   <input
                     value={editText}
                     onChange={(e) => setEditText(e.target.value)}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        handleUpdate(todo.id);   // ⏎ 저장
-                      } else if (e.key === 'Escape') {
-                        handleCancel();          // ⎋ 취소
-                      }
+                      if (e.key === 'Enter') handleUpdate(todo.id);
+                      else if (e.key === 'Escape') handleCancel();
                     }}
+                    className="flex-1 px-2 py-1 border rounded"
                   />
-                  <button onClick={() => handleUpdate(todo.id)}>저장</button>
-                  <button onClick={handleCancel}>취소</button>
-                </>
+                  <button
+                    onClick={() => handleUpdate(todo.id)}
+                    className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  >
+                    저장
+                  </button>
+                  <button
+                    onClick={handleCancel}
+                    className="px-3 py-1 text-gray-600 hover:underline"
+                  >
+                    취소
+                  </button>
+                </div>
               ) : (
                 <>
-                  <label>
+                  <label className="flex-1 flex items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={todo.completed}
-                      onChange={() => onToggle(todo)}
+                      onChange={() => handleToggle(todo.id)}
+                      className="w-4 h-4"
                     />
-                    <span style={{ textDecoration: todo.completed ? 'line-through' : 'none' }}>
+                    <span
+                      className={`${
+                        todo.completed ? 'line-through text-gray-400' : ''
+                      }`}
+                    >
                       {todo.title}
                     </span>
                   </label>
-                  <button onClick={() => handleEditClick(todo)}>✏ 수정</button>
-                  <button onClick={() => onDelete(todo.id)} style={{ color: 'red' }}>
-                    🗑 삭제
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleEditClick(todo)}
+                      className="text-blue-500 hover:underline"
+                    >
+                      ✏ 수정
+                    </button>
+                    <button
+                      onClick={() => handleDelete(todo.id)}
+                      className="text-red-500 hover:underline"
+                    >
+                      🗑 삭제
+                    </button>
+                  </div>
                 </>
               )}
             </li>
-          ))
-        )}
-      </ul>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

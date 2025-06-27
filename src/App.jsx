@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import axios from './axios';
 import TodoList from './components/TodoList';
 import AddTodo from './components/AddTodo';
 import LoginForm from './components/LoginForm';
@@ -20,7 +20,7 @@ function App() {
 
   const fetchTodos = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/todos', {
+      const response = await axios.get('/todos', {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('jwt')}`,
         },
@@ -69,20 +69,33 @@ function App() {
   }
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       {isLoggedIn ? (
-        <div style={{ padding: '20px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <h2>📝 DEMO</h2>
-            <button onClick={handleLogout}>🚪 로그아웃</button>
+        <div className="w-full max-w-2xl bg-white rounded-lg shadow-md p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-bold text-blue-600">📝 TODO DEMO</h2>
+            <button
+              onClick={handleLogout}
+              className="text-sm bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
+            >
+              🚪 로그아웃
+            </button>
           </div>
           <AddTodo onAdd={handleAdd} />
-          <TodoList todos={todos} onToggle={handleToggle} onDelete={handleDelete} onUpdate={handleUpdate}/>
+          <TodoList
+            todos={todos}
+            onToggle={handleToggle}
+            onDelete={handleDelete}
+            onUpdate={handleUpdate}
+          />
         </div>
       ) : isRegistering ? (
         <RegisterForm onGoToLogin={() => setIsRegistering(false)} />
       ) : (
-        <LoginForm onLoginSuccess={handleLoginSuccess} onGoToRegister={() => setIsRegistering(true)} />
+        <LoginForm
+          onLoginSuccess={handleLoginSuccess}
+          onGoToRegister={() => setIsRegistering(true)}
+        />
       )}
     </div>
   );
