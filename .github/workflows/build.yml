@@ -44,7 +44,29 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/todo-app-frontend:latest
+          tags: ghcr.io/${{ github.repository_owner }}/myapp-frontend:${{ github.sha }}
           platforms: |
             linux/amd64
             linux/arm64
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set Git Config
+        run: |
+          git config --global user.name ${{ github.repository_owner }}
+          git config --global user.email "gywhd408@naver.com"
+
+      - name: Clone Deploy Repository
+        run: |
+          git clone --depth 1 --branch main https://${{ secrets.GIT_TOKEN }}@github.com/${{ github.repository_owner }}/argocd-deploy.git
+
+      - name: Update image tage
+        run: |
+          cd argocd-deploy
+          sed -i "s|ghcr.io/${{ github.repository_owner }}/myapp-frontend:.*|ghcr.io/${{ github.repository_owner }}/myapp-frontend:${{ github.sha }}|" ./front/deployment.yaml
+
+          git add .
+          git commit -m "Update deploy image tag to ${{ github.sha }}"
+          git push origin main
